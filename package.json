@@ -1,0 +1,29 @@
+{
+  "name": "axe-testcafe",
+  "version": "0.0.1",
+  "description": "The helper for using Axe in TestCafe tests",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/helen-dikareva/axe-testcafe"
+  },
+  "keywords": [
+    "axe",
+    "testcafe",
+    "test",
+    "accessibility"
+  ],
+  "author": "Helen Dikareva (elena.dikareva@devexpress.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/helen-dikareva/axe-testcafe/issues"
+  },
+  "homepage": "https://github.com/helen-dikareva/axe-testcafe",
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "axe-core": "^2.2.3",
+    "testcafe": "^0.15.0"
+  }
+}
