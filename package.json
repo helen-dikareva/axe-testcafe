@@ -1,7 +1,7 @@
 {
   "name": "axe-testcafe",
   "version": "0.0.1",
-  "description": "The helper for using Axe in TestCafe tests",
+  "description": "The TestCafe module that allows you to use the aXe accessibility engine in TestCafe tests",
   "main": "index.js",
   "repository": {
     "type": "git",
