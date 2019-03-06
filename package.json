@@ -23,7 +23,7 @@
     "index.js"
   ],
   "dependencies": {
-    "axe-core": "^2.2.3"
+    "axe-core": "^2.2.3 || ^3.0.0"
   },
   "peerDependencies": {
     "testcafe": "*"
