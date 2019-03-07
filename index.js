@@ -3,7 +3,7 @@ const path = require('path');
 const { ClientFunction } = require('testcafe');
 const { red, green, reset } = require('chalk');
 
-var AXE_DIR_PATH = path.dirname(require.resolve('axe-core'));
+const AXE_DIR_PATH = path.dirname(require.resolve('axe-core'));
 const AXE_SCRIPT = fs.readFileSync(path.join(AXE_DIR_PATH, 'axe.min.js'), 'utf8');
 
 const hasAxe = ClientFunction(() => !!(window.axe && window.axe.run));
@@ -18,26 +18,28 @@ const runAxe = ClientFunction((context, options = {}) => {
     });
 });
 
-const createReport = (violations) => {
-    if (violations.length !== 0) {
-        const report = violations.reduce((acc, { nodes, help }, i) => {
-
-            acc += red(`${i+1}) ${help}\n`);
-            
-            acc += reset(nodes.reduce((e, { target }) => {
-                const targetNodes = target.map((t) => `"${t}"`).join(', ');
-                e += `\t${targetNodes}\n`;
-                return e;
-            },''));
-
-            return acc;
-
-        }, red(`${violations.length} violations found:\n`));
-
-        return reset(report);
+const createReport = violations => {
+    if (!violations.length) {
+        return green('0 violations found');
     }
-    return green('0 violations found');
-}
+
+    const report = violations.reduce((acc, { nodes, help }, i) => {
+
+        acc += red(`${i+1}) ${help}\n`);
+        
+        acc += reset(nodes.reduce((e, { target }) => {
+            const targetNodes = target.map((t) => `"${t}"`).join(', ');
+            e += `\t${targetNodes}\n`;
+            return e;
+        },''));
+
+        return acc;
+
+    }, red(`${violations.length} violations found:\n`));
+
+    return reset(report);
+    
+};
 
 const axeCheck = async (t, context, options) => {
     const hasScript = await hasAxe.with({ boundTestRun: t })();
