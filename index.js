@@ -41,9 +41,8 @@ const createReport = (violations) => {
 
 const axeCheck = async (t, context, options) => {
     const hasScript = await hasAxe.with({ boundTestRun: t })();
-    if (!hasScript) {
+    if (!hasScript)
         await injectAxe.with({ boundTestRun: t })();
-    }
 
     try {
         return await runAxe.with({ boundTestRun: t })(context, options);
