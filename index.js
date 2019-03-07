@@ -8,9 +8,7 @@ const AXE_SCRIPT = fs.readFileSync(path.join(AXE_DIR_PATH, 'axe.min.js'), 'utf8'
 
 const hasAxe = ClientFunction(() => !!(window.axe && window.axe.run));
 
-const injectAxe = ClientFunction(() => {
-    eval(AXE_SCRIPT);
-}, { dependencies: { AXE_SCRIPT } });
+const injectAxe = ClientFunction(() => eval(AXE_SCRIPT), { dependencies: { AXE_SCRIPT } });
 
 const runAxe = ClientFunction((context, options = {}) => {
     return new Promise((resolve) => {
