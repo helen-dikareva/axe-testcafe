@@ -12,7 +12,7 @@ npm install axe-core axe-testcafe --save-dev
 You can write a TestCafe test with automated accessibility checks like this.
 
 ```js
-import { axeCheck, createReport } from '../lib/axe';
+import { axeCheck, createReport } from 'axe-testcafe';
 
 fixture `TestCafe tests with Axe`
     .page `http://example.com`;
