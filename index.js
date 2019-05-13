@@ -1,74 +1,59 @@
-var fs       = require('fs');
-var path     = require('path');
-var testcafe = require('testcafe');
+const fs = require('fs');
+const path = require('path');
+const { ClientFunction } = require('testcafe');
+const { red, green, reset } = require('chalk');
 
-var ClientFunction = testcafe.ClientFunction;
+const AXE_DIR_PATH = path.dirname(require.resolve('axe-core'));
+const AXE_SCRIPT = fs.readFileSync(path.join(AXE_DIR_PATH, 'axe.min.js'), 'utf8');
 
-var AXE_DIR_PATH = path.dirname(require.resolve('axe-core'));
-var AXE_SCRIPT   = fs.readFileSync(path.join(AXE_DIR_PATH, 'axe.min.js')).toString();
+const hasAxe = ClientFunction(() => !!(window.axe && window.axe.run));
 
-function AxeError (message) {
-    Error.call(this, message);
+const injectAxe = ClientFunction(() => eval(AXE_SCRIPT), { dependencies: { AXE_SCRIPT } });
 
-    this.name    = 'AxeError';
-    this.message = message;
-
-    if (typeof Error.captureStackTrace === 'function')
-        Error.captureStackTrace(this, AxeError);
-    else
-        this.stack = (new Error(message)).stack;
-}
-
-AxeError.prototype = Object.create(Error.prototype);
-
-var hasAxe = ClientFunction(function () {
-    return !!(window.axe && window.axe.run);
+const runAxe = ClientFunction((context, options = {}) => {
+    return new Promise((resolve) => {
+        axe.run(context || document, options, (error, { violations }) => {
+            resolve({ error, violations });
+        });
+    });
 });
 
-var injectAxe = ClientFunction(function () {
-    eval(AXE_SCRIPT);
-}, { dependencies: { AXE_SCRIPT: AXE_SCRIPT } });
+const createReport = violations => {
+    if (!violations.length) {
+        return green('0 violations found');
+    }
 
-var runAxe = ClientFunction(function (context, options) {
-    return new Promise(function (resolve) {
-        axe.run(context || document, options || {}, function (err, results) {
-            if (err)
-                return resolve(err.message);
+    const report = violations.reduce((acc, { nodes, help }, i) => {
 
-            var errors = '';
+        acc += red(`${i+1}) ${help}\n`);
+        
+        acc += reset(nodes.reduce((e, { target }) => {
+            const targetNodes = target.map((t) => `"${t}"`).join(', ');
+            e += `\t${targetNodes}\n`;
+            return e;
+        },''));
 
-            if (results.violations.length !== 0) {
-                results.violations.forEach(function (violation) {
-                    errors += violation.help + '\n\tnodes:\n';
+        return acc;
 
-                    violation.nodes.forEach(function (node) {
-                        var targetNodes = node.target.map(function (target) {
-                            return '"' + target + '"';
-                        }).join(', ');
+    }, red(`${violations.length} violations found:\n`));
 
-                        errors += '\t\t' + targetNodes + '\n';
-                    });
-                });
-            }
+    return reset(report);
+    
+};
 
-           return resolve(errors);
-        });
-    })
-});
+const axeCheck = async (t, context, options) => {
+    const hasScript = await hasAxe.with({ boundTestRun: t })();
+    if (!hasScript)
+        await injectAxe.with({ boundTestRun: t })();
 
-module.exports = function axeCheck (t, context, options) {
-    return hasAxe.with({ boundTestRun: t })()
-        .then(function (result) {
-            if (!result)
-                return injectAxe.with({ boundTestRun: t })();
+    try {
+        return await runAxe.with({ boundTestRun: t })(context, options);
+    } catch (e) {
+        return { error: e };
+    }
+};
 
-            return Promise.resolve();
-        })
-        .then(function () {
-            return runAxe.with({ boundTestRun: t })(context, options);
-        })
-        .then(function (error) {
-            if (error)
-                throw new AxeError('\n' + error);
-        });
+module.exports = {
+    axeCheck,
+    createReport
 };
