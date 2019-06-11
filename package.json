@@ -1,6 +1,6 @@
 {
   "name": "axe-testcafe",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "The TestCafe module that allows you to use the aXe accessibility engine in TestCafe tests",
   "main": "index.js",
   "typings": "index.d.ts",
