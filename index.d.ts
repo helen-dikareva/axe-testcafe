@@ -2,6 +2,11 @@ declare module 'axe-testcafe' {
   import { ElementContext, RunOnly, AxeResults, Result } from 'axe-core';
   import 'testcafe';
 
+  interface AxeTestCafeResult {
+    error: Error | null;
+    violations?: Result[];
+  }
+
   export function axeCheck(
     t: TestController,
     context?: ElementContext,
@@ -12,7 +17,7 @@ declare module 'axe-testcafe' {
       elementRef?: Boolean;
       selectors?: Boolean;
     }
-  ): Promise<AxeResults>;
+  ): Promise<AxeTestCafeResult>;
 
   export function createReport(violations: Result[]): string;
 }
