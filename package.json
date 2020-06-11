@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/helen-dikareva/axe-testcafe",
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
   "peerDependencies": {
     "axe-core": ">=2.2.3 <4",
